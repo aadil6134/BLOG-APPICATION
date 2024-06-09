@@ -1,10 +1,33 @@
 // server.js
 const express = require('express');
-const app = express();
-const db = require('./database');
-const bodyParser = require('body-parser');
+const path = require("path");
+const cors = require("cors");
 
-app.use(bodyParser.json());
+const { open } = require("sqlite");
+const sqlite3 = require("sqlite3");
+const app = express();
+app.use(express.json())
+
+const dbPath = path.join(__dirname, "blog.db");
+
+let db = null;
+
+const initializeDBAndServer = async () => {
+  try {
+    db = await open({
+      filename: dbPath,
+      driver: sqlite3.Database,
+    });
+    app.listen(3000, () => {
+      console.log("Server Running at http://localhost:3000/");
+    });
+  } catch (e) {
+    console.log(`DB Error: ${e.message}`);
+    process.exit(1);
+  }
+};
+
+initializeDBAndServer();
 
 // Routes
 app.post('/register', (req, res) => {
