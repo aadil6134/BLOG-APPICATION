@@ -88,7 +88,7 @@ app.post("/login", async (req, res) => {
 app.get("/blogs/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const getBlogQuery = `SELECT * FROM Blogs WHERE id = ${id}`;
+    const getBlogQuery = `SELECT * FROM Blogs WHERE blog_id = ${id}`;
     const blog = await db.get(getBlogQuery);
     if (blog) {
       res.send(blog);
@@ -124,7 +124,7 @@ app.put("/blogs/:id", async (req, res) => {
     const updateBlogQuery = `
       UPDATE Blogs 
       SET title = '${title}', content = '${content}' 
-      WHERE id = ${id}
+      WHERE blog_id = ${id}
     `;
     await db.run(updateBlogQuery);
     res.send(`Blog with ID ${id} updated successfully`);
@@ -137,7 +137,7 @@ app.put("/blogs/:id", async (req, res) => {
 app.delete("/blogs/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const deleteBlogQuery = `DELETE FROM Blogs WHERE id = ${id}`;
+    const deleteBlogQuery = `DELETE FROM Blogs WHERE blog_id = ${id}`;
     await db.run(deleteBlogQuery);
     res.send(`Blog with ID ${id} deleted successfully`);
   } catch (error) {
@@ -160,11 +160,11 @@ app.get("/blogs/:id/comments", async (req, res) => {
 // Add a comment to a blog
 app.post("/blogs/:id/comments", async (req, res) => {
   const { id } = req.params;
-  const { content, authorId } = req.body;
+  const { content, userId, createdAt } = req.body;
   try {
     const addCommentQuery = `
-      INSERT INTO Comments (content, blog_id, author_id) 
-      VALUES ('${content}', ${id}, ${authorId})
+      INSERT INTO Comments (blog_id, user_id, comment_text, created_at) 
+      VALUES (${id}, ${userId}, '${content}', '${createdAt}');
     `;
     const dbResponse = await db.run(addCommentQuery);
     const newCommentId = dbResponse.lastID;
@@ -178,7 +178,7 @@ app.post("/blogs/:id/comments", async (req, res) => {
 app.get("/users/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const getUserQuery = `SELECT * FROM Users WHERE id = ${id}`;
+    const getUserQuery = `SELECT * FROM Users WHERE user_id = ${id}`;
     const user = await db.get(getUserQuery);
     if (user) {
       res.send(user);
@@ -198,7 +198,7 @@ app.put("/users/:id", async (req, res) => {
     const updateUserQuery = `
       UPDATE Users 
       SET username = '${username}', email = '${email}'
-      WHERE id = ${id}
+      WHERE user_id = ${id}
     `;
     await db.run(updateUserQuery);
     res.send(`User with ID ${id} updated successfully`);
