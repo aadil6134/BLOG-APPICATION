@@ -105,7 +105,7 @@ app.post("/blogs", async (req, res) => {
   const { title, content, authorId } = req.body;
   try {
     const createBlogQuery = `
-      INSERT INTO Blogs (title, content, author_id) 
+      INSERT INTO Blogs (title, content, user_id) 
       VALUES ('${title}', '${content}', ${authorId})
     `;
     const dbResponse = await db.run(createBlogQuery);
@@ -160,11 +160,11 @@ app.get("/blogs/:id/comments", async (req, res) => {
 // Add a comment to a blog
 app.post("/blogs/:id/comments", async (req, res) => {
   const { id } = req.params;
-  const { content, userId, createdAt } = req.body;
+  const { content, userId } = req.body;
   try {
     const addCommentQuery = `
-      INSERT INTO Comments (blog_id, user_id, comment_text, created_at) 
-      VALUES (${id}, ${userId}, '${content}', '${createdAt}');
+      INSERT INTO Comments (blog_id, user_id, comment_text) 
+      VALUES (${id}, ${userId}, '${content}');
     `;
     const dbResponse = await db.run(addCommentQuery);
     const newCommentId = dbResponse.lastID;
